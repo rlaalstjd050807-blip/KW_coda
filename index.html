@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>축제 주점 QR 오더</title>
+</head>
+<body>
+  <h2>🍺 축제 주점 주문하기 🍺</h2>
+
+  <label>테이블 번호:
+    <input type="text" id="table" placeholder="예: 3번">
+  </label><br><br>
+
+  <label>메뉴:
+    <select id="menu">
+      <option value="맥주">맥주</option>
+      <option value="소주">소주</option>
+      <option value="콜라">콜라</option>
+      <option value="치킨">치킨</option>
+    </select>
+  </label><br><br>
+
+  <label>수량:
+    <input type="number" id="quantity" value="1" min="1">
+  </label><br><br>
+
+  <button onclick="submitOrder()">주문하기</button>
+
+  <p id="status"></p>
+
+  <script>
+    const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbwHrIv9Q4E3zPhk-1nTl3byJzZ60d9NpA-LDZvhXjgdQicuSJIng6TB_xhDymcBP4gn/exec";
+
+    function submitOrder() {
+      const table = document.getElementById("table").value;
+      const menu = document.getElementById("menu").value;
+      const quantity = document.getElementById("quantity").value;
+
+      if (!table) {
+        alert("테이블 번호를 입력하세요!");
+        return;
+      }
+
+      fetch(WEBAPP_URL, {
+        method: "POST",
+        body: JSON.stringify({table, menu, quantity}),
+        headers: {"Content-Type": "application/json"}
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.status === "success") {
+          document.getElementById("status").innerText = "✅ 주문 완료! 잠시만 기다려주세요.";
+        } else {
+          document.getElementById("status").innerText = "❌ 주문 실패. 다시 시도해주세요.";
+        }
+      })
+      .catch(err => {
+        document.getElementById("status").innerText = "⚠️ 서버 오류 발생.";
+        console.error(err);
+      });
+    }
+  </script>
+</body>
+</html>
